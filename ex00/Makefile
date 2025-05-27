@@ -1,6 +1,6 @@
-NAME = scalar
+NAME = convert
 
-SRC = main.cpp 
+SRC = main.cpp ScalarConverter.cpp Converter.cpp
 	 	 
 OBJ = $(SRC:.cpp=.o)
 
