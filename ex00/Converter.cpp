@@ -1,8 +1,11 @@
-#include "Converter.hpp"
-#include <cstdlib>  // strtol, strtod, strtof not standard C++98 but available in C
-#include <cerrno>
-#include <cctype>
-#include <cstring>
+# include "Converter.hpp"
+# include <cstdlib>  
+# include <cerrno>
+# include <cctype>
+# include <cstring>
+# include <cmath>  
+# include <climits> 
+# include <iomanip> 
 
 //constructors
 Converter::Converter() {}
@@ -73,6 +76,66 @@ bool Converter::isPseudoLiteral(const std::string &s) {
     }
     return false;
 }
+
+// Checks if a char is printable displayable ASCII
+bool Converter::isDisplayable(char c) {
+    return c >= 32 && c <= 126;
+}
+
+void Converter::printChar(double value) {
+    if (std::isnan(value) || value < 0 || value > 127) {
+        std::cout << "char: impossible\n";
+        return;
+    }
+    char c = static_cast<char>(value);
+    if (isDisplayable(c))
+        std::cout << "char: '" << c << "'\n";
+    else
+        std::cout << "char: Non displayable\n";
+}
+
+void Converter::printInt(double value) {
+    if (std::isnan(value) || value < static_cast<double>(INT_MIN) || value > static_cast<double>(INT_MAX)) {
+        std::cout << "int: impossible\n";
+        return;
+    }
+    int i = static_cast<int>(value);
+    std::cout << "int: " << i << "\n";
+}
+
+void Converter::printFloat(double value) {
+    float f = static_cast<float>(value);
+    std::cout << std::fixed << std::setprecision(1);
+
+    if (std::isnan(f)) {
+        std::cout << "float: nanf\n";
+        return;
+    }
+
+    if (std::isinf(f)) {
+        std::cout << "float: " << (f > 0 ? "+inff\n" : "-inff\n");
+        return;
+    }
+
+    std::cout << "float: " << f << "f\n";
+}
+
+void Converter::printDouble(double value) {
+    std::cout << std::fixed << std::setprecision(1);
+
+    if (std::isnan(value)) {
+        std::cout << "double: nan\n";
+        return;
+    }
+
+    if (std::isinf(value)) {
+        std::cout << "double: " << (value > 0 ? "+inf\n" : "-inf\n");
+        return;
+    }
+
+    std::cout << "double: " << value << "\n";
+}
+
 
 // static method to detect type of literal
 LiteralType Converter::detectType(const std::string &literal) {
