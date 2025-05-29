@@ -2,8 +2,6 @@
 #define SCALARCONVERTER_HPP
 
 #include <iostream>
-#include <string>
-#include <iomanip>    // For std::fixed, std::setprecision
 
 class ScalarConverter
 {

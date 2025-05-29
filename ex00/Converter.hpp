@@ -22,7 +22,8 @@ private:
     Converter(const Converter &other);
     Converter &operator=(const Converter &other);
     ~Converter();
-
+   
+    public:
     // Validation helpers
     static bool isSingleChar(const std::string &s);
     static bool isCharLiteral(const std::string &s);
@@ -30,10 +31,7 @@ private:
     static bool isFloatLiteral(const std::string &s);
     static bool isDoubleLiteral(const std::string &s);
     static bool isPseudoLiteral(const std::string &s);
-  
-    public:
-     // Helper to check if number is displayable
-     static bool isDisplayable(char c);
+    static bool isDisplayable(char c);
 
     // Print helpers 
     static void printChar(double value);

@@ -1,8 +1,10 @@
 # include "ScalarConverter.hpp"
 # include "Converter.hpp"
 # include <cerrno>
-# include <cfloat>     // For DBL_MAX
 # include <cstdlib>
+# include <climits>     // for INT_MIN, INT_MAX
+# include <cmath>       // for isnan, isinf
+# include <iomanip>     // for std::fixed, std::setprecision
 
 // Constructors
 ScalarConverter::ScalarConverter() {}
@@ -15,36 +17,82 @@ ScalarConverter &ScalarConverter::operator=(const ScalarConverter &other) {
 
 ScalarConverter::~ScalarConverter() {}
 
-// The main conversion method, parses and prints all types
+// Conversion method, parses and prints all types
+
 void ScalarConverter::convert(const std::string &literal) {
+    // Detect the type first
+    LiteralType type = Converter::detectType(literal);
     double value = 0.0;
 
-    // Use ternary for char literal detection
-    value = (literal.size() == 3 && literal[0] == '\'' && literal[2] == '\'') ? static_cast<double>(literal[1]) :
-            (literal.size() == 1 && Converter::isDisplayable(literal[0]) && !std::isdigit(static_cast<unsigned char>(literal[0]))) ? static_cast<double>(literal[0]) :
-            0.0; // fallback 0, will parse below if literal not char
+    switch (type) {
+        case CHAR:
+            if (Converter::isCharLiteral(literal)) {
+                // e.g. literal = "'a'"
+                value = static_cast<double>(literal[1]);
+            } else {
+                // Single printable char without quotes, e.g. "a"
+                value = static_cast<double>(literal[0]);
+            }
+            break;
 
-    if (value == 0.0 && !(literal.size() == 3 && literal[0] == '\'' && literal[2] == '\'') &&
-        !(literal.size() == 1 && Converter::isDisplayable(literal[0]) && !std::isdigit(static_cast<unsigned char>(literal[0])))) {
-        // parse double with possible 'f' stripped
-        std::string tmp = literal;
-        if (tmp[tmp.length() - 1] == 'f' && tmp != "inf" && tmp != "+inf" && tmp != "-inf") {
-            tmp = tmp.substr(0, tmp.length() - 1);
+        case INT: {
+            // Convert string to int, then to double
+            errno = 0;
+            char *endptr = NULL;
+            long intVal = std::strtol(literal.c_str(), &endptr, 10);
+            if (errno != 0 || *endptr != '\0' || intVal < INT_MIN || intVal > INT_MAX) {
+                std::cout << "Error: invalid integer literal\n";
+                return;
+            }
+            value = static_cast<double>(intVal);
+            break;
         }
 
-        char *endptr = NULL;
-        errno = 0;
-        value = std::strtod(tmp.c_str(), &endptr);
+        case FLOAT: {
+            // Convert string to float, strip trailing 'f'
+            std::string tmp = literal.substr(0, literal.size() - 1); 
+            errno = 0;
+            char *endptr = NULL;
+            float floatVal = std::strtof(tmp.c_str(), &endptr);
+            if (errno != 0 || *endptr != '\0') {
+                std::cout << "Error: invalid float literal\n";
+                return;
+            }
+            value = static_cast<double>(floatVal);
+            break;
+        }
 
-        if (errno != 0 || *endptr != '\0') {
+        case DOUBLE: {
+            // Convert string to double
+            errno = 0;
+            char *endptr = NULL;
+            value = std::strtod(literal.c_str(), &endptr);
+            if (errno != 0 || *endptr != '\0') {
+                std::cout << "Error: invalid double literal\n";
+                return;
+            }
+            break;
+        }
+
+        case PSEUDO_LITERAL: {
+            // Handle pseudo literals like nan, +inf, -inf etc.
+            // Use std::strtod to convert them properly
+            errno = 0;
+            char *endptr = NULL;
+            value = std::strtod(literal.c_str(), &endptr);
+            // No error checking because these are valid special values
+            break;
+        }
+
+        case INVALID:
+        default:
             std::cout << "Error: invalid literal\n";
             return;
-        }
     }
 
+    // Print converted values
     Converter::printChar(value);
     Converter::printInt(value);
     Converter::printFloat(value);
     Converter::printDouble(value);
 }
-

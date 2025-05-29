@@ -7,6 +7,7 @@
 # include <climits> 
 # include <iomanip> 
 
+
 //constructors
 Converter::Converter() {}
 
@@ -140,10 +141,7 @@ void Converter::printDouble(double value) {
 // static method to detect type of literal
 LiteralType Converter::detectType(const std::string &literal) {
     if (literal.empty()) return INVALID;
-
-    if (isSingleChar(literal))
-        return CHAR;
-
+    if (isSingleChar(literal)) return CHAR;
     if (isCharLiteral(literal)) return CHAR;
     if (isPseudoLiteral(literal)) return PSEUDO_LITERAL;
     if (isIntLiteral(literal)) return INT;
