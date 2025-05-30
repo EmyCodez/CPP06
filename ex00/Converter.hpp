@@ -4,8 +4,8 @@
 #include <string>
 #include <iostream>
 #include <iomanip>
-#include <cmath>    // for std::isnan, std::isinf
-#include <cctype>   // for std::isprint
+#include <cmath>    
+#include <cctype>
 
 enum LiteralType {
     CHAR,

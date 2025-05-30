@@ -2,9 +2,7 @@
 # include "Converter.hpp"
 # include <cerrno>
 # include <cstdlib>
-# include <climits>     // for INT_MIN, INT_MAX
-# include <cmath>       // for isnan, isinf
-# include <iomanip>     // for std::fixed, std::setprecision
+# include <climits>   
 
 // Constructors
 ScalarConverter::ScalarConverter() {}
@@ -18,20 +16,17 @@ ScalarConverter &ScalarConverter::operator=(const ScalarConverter &other) {
 ScalarConverter::~ScalarConverter() {}
 
 // Conversion method, parses and prints all types
-
 void ScalarConverter::convert(const std::string &literal) {
-    // Detect the type first
+    
     LiteralType type = Converter::detectType(literal);
     double value = 0.0;
 
     switch (type) {
         case CHAR:
             if (Converter::isCharLiteral(literal)) {
-                // e.g. literal = "'a'"
-                value = static_cast<double>(literal[1]);
+                    value = static_cast<double>(literal[1]);
             } else {
-                // Single printable char without quotes, e.g. "a"
-                value = static_cast<double>(literal[0]);
+                    value = static_cast<double>(literal[0]);
             }
             break;
 
@@ -76,11 +71,9 @@ void ScalarConverter::convert(const std::string &literal) {
 
         case PSEUDO_LITERAL: {
             // Handle pseudo literals like nan, +inf, -inf etc.
-            // Use std::strtod to convert them properly
             errno = 0;
             char *endptr = NULL;
             value = std::strtod(literal.c_str(), &endptr);
-            // No error checking because these are valid special values
             break;
         }
 
@@ -90,7 +83,6 @@ void ScalarConverter::convert(const std::string &literal) {
             return;
     }
 
-    // Print converted values
     Converter::printChar(value);
     Converter::printInt(value);
     Converter::printFloat(value);
