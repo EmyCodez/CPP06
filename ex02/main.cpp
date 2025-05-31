@@ -44,20 +44,20 @@ void identify(Base& p) {
         (void)dynamic_cast<A&>(p);
         std::cout << "Reference identifies: A" << std::endl;
         return;
-    } catch (std::bad_cast) {}
+    } catch (const std::exception& e) { }
 
     try {
         (void)dynamic_cast<B&>(p);
         std::cout << "Reference identifies: B" << std::endl;
         return;
-    } catch (std::bad_cast) {}
-
+    } catch (const std::exception& e) {}
+        
     try {
         (void)dynamic_cast<C&>(p);
         std::cout << "Reference identifies: C" << std::endl;
         return;
-    } catch (std::bad_cast) {}
-
+    } catch (const std::exception& e) {}
+  
     std::cout << "Reference identifies: Unknown" << std::endl;
 }
 
@@ -70,3 +70,4 @@ int main() {
     delete obj;
     return 0;
 }
+
